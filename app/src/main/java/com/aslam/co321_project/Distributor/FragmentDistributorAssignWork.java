@@ -16,7 +16,6 @@ import android.widget.Toast;
 import com.aslam.co321_project.Common.BoxList;
 import com.aslam.co321_project.Common.UploadDeliveryDetails;
 import com.aslam.co321_project.R;
-import com.aslam.co321_project.Common.TaskClass;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -25,7 +24,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -53,6 +51,10 @@ public class FragmentDistributorAssignWork extends Fragment {
     private String selectedDriverId;
     private String selectedPharmacyId;
     private String randomId;
+    private String distributorName;
+    private String pharmacyName;
+    private String driverName;
+    private String cityName;
     private UploadDeliveryDetails uploadDeliveryDetails;
 
     public FragmentDistributorAssignWork() {
@@ -258,13 +260,65 @@ public class FragmentDistributorAssignWork extends Fragment {
         selectedDriverId = driverMap.get((int) tempDriverId);
         selectedPharmacyId = pharmacyMap.get((int) tempPharmacyId);
 
-        randomId = UUID.randomUUID().toString();
-        uploadDeliveryDetails = new UploadDeliveryDetails(distributorId, selectedPharmacyId, selectedDriverId, randomId, boxList);
+        getDistributorName();
 
-        try {
-            setDriverTask();
-        } catch (Exception e){
-            Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
+    }
+
+    private void getDistributorName() {
+        databaseReference.child("distributors").child(distributorId).child("shopName").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                distributorName = dataSnapshot.getValue().toString();
+                getPharmacyName();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getPharmacyName() {
+        databaseReference.child("pharmacies").child(selectedPharmacyId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                pharmacyName = dataSnapshot.child("pharmacyName").getValue().toString();
+                String address = dataSnapshot.child("pharmacyAddress").getValue().toString();
+                String [] splittedBoxArray = address.split("\\s+");
+                cityName = splittedBoxArray[splittedBoxArray.length-1];
+
+                getDriverName();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getDriverName() {
+        databaseReference.child("userInfo").child(selectedDriverId).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                driverName = dataSnapshot.getValue().toString();
+
+                randomId = UUID.randomUUID().toString();
+                uploadDeliveryDetails = new UploadDeliveryDetails(distributorName, pharmacyName, driverName, cityName,
+                        distributorId, selectedPharmacyId, selectedDriverId, randomId, boxList);
+
+                try {
+                    setDriverTask();
+                } catch (Exception e){
+                    Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

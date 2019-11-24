@@ -8,13 +8,22 @@ public class UploadDeliveryDetails {
     String pharmacyId;
     String driverId;
     String randomId;
+    String distributorName;
+    String pharmacyName;
+    String driverName;
+    String cityName;
     BoxList boxList;
     LinkedList<String> linkedList;
 
     public UploadDeliveryDetails() {
     }
 
-    public UploadDeliveryDetails(String distributorId, String pharmacyId, String driverId, String randomId, BoxList boxList) {
+    public UploadDeliveryDetails(String distributorName, String pharmacyName, String driverName, String cityName,
+                                 String distributorId, String pharmacyId, String driverId, String randomId, BoxList boxList) {
+        this.distributorName = distributorName;
+        this.pharmacyName = pharmacyName;
+        this.driverName = driverName;
+        this.cityName = cityName;
         this.distributorId = distributorId;
         this.pharmacyId = pharmacyId;
         this.driverId = driverId;
@@ -22,7 +31,12 @@ public class UploadDeliveryDetails {
         this.boxList = boxList;
     }
 
-    public UploadDeliveryDetails(String distributorId, String pharmacyId, String driverId, String randomId, LinkedList<String> linkedList) {
+    public UploadDeliveryDetails(String distributorName, String pharmacyName, String driverName, String cityName,
+                                 String distributorId, String pharmacyId, String driverId, String randomId, LinkedList<String> linkedList) {
+        this.distributorName = distributorName;
+        this.pharmacyName = pharmacyName;
+        this.driverName = driverName;
+        this.cityName = cityName;
         this.distributorId = distributorId;
         this.pharmacyId = pharmacyId;
         this.driverId = driverId;

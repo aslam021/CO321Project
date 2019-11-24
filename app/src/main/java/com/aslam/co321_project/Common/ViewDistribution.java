@@ -5,9 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,6 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.LinkedList;
+import java.util.UUID;
 
 public class ViewDistribution extends AppCompatActivity {
 
@@ -39,11 +38,17 @@ public class ViewDistribution extends AppCompatActivity {
     private String pharmacyId;
     private String driverId;
     private String randomId;
+    private String distributorName;
+    private String pharmacyName;
+    private String driverName;
+    private String cityName;
+
     private String phoneLeft = "";
     private String phoneRight = "";
 
     private ListView listView;
     private LinkedList<String> linkedList; //boxList
+    private UploadDeliveryDetails uploadDeliveryDetails;
 
     private Button buttonLeftCall;
     private Button buttonRightCall;
@@ -379,11 +384,10 @@ public class ViewDistribution extends AppCompatActivity {
     //method to execute when delivered button is clicked
     private void handleDelivered() {
         //update & delete one by one
-        updateDistributor();
+        getDistributorName();
     }
 
     private void updateDistributor() {
-        UploadDeliveryDetails uploadDeliveryDetails = new UploadDeliveryDetails(distributorId, pharmacyId, driverId, randomId, linkedList);
 
         databaseReference.child("distributorTask").child(distributorId).child("pastDeliveries").child(randomId).setValue(uploadDeliveryDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -398,9 +402,60 @@ public class ViewDistribution extends AppCompatActivity {
         });
     }
 
-    private void updatePharmacist() {
-        UploadDeliveryDetails uploadDeliveryDetails = new UploadDeliveryDetails(distributorId, pharmacyId, driverId, randomId, linkedList);
+    private void getDistributorName() {
+        databaseReference.child("distributors").child(distributorId).child("shopName").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                distributorName = dataSnapshot.getValue().toString();
+                getPharmacyName();
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getPharmacyName() {
+        databaseReference.child("pharmacies").child(pharmacyId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                pharmacyName = dataSnapshot.child("pharmacyName").getValue().toString();
+                String address = dataSnapshot.child("pharmacyAddress").getValue().toString();
+                String [] splittedBoxArray = address.split("\\s+");
+                cityName = splittedBoxArray[splittedBoxArray.length-1];
+
+                getDriverName();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getDriverName() {
+        databaseReference.child("userInfo").child(driverId).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                driverName = dataSnapshot.getValue().toString();
+
+                randomId = UUID.randomUUID().toString();
+                uploadDeliveryDetails = new UploadDeliveryDetails(distributorName, pharmacyName, driverName, cityName, distributorId, pharmacyId, driverId, randomId, linkedList);
+
+                updateDistributor();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void updatePharmacist() {
         databaseReference.child("pharmacyTask").child(pharmacyId).child("pastDeliveries").child(randomId).setValue(uploadDeliveryDetails)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -417,8 +472,6 @@ public class ViewDistribution extends AppCompatActivity {
     }
 
     private void updateDriver() {
-        UploadDeliveryDetails uploadDeliveryDetails = new UploadDeliveryDetails(distributorId, pharmacyId, driverId, randomId, linkedList);
-
         databaseReference.child("driverTask").child(MainActivity.uid).child("pastDeliveries").child(randomId).setValue(uploadDeliveryDetails)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

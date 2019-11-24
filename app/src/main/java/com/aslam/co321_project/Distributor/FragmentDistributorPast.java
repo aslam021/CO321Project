@@ -104,33 +104,11 @@ public class FragmentDistributorPast extends Fragment {
                     final String driverId = tempSnapShot.child("driverId").getValue().toString();
                     final String randomId = tempSnapShot.child("randomId").getValue().toString();
 
+                    final String pharmacyName = tempSnapShot.child("pharmacyName").getValue().toString();
+                    final String driverName = tempSnapShot.child("driverName").getValue().toString();
+                    DeliverDetails deliverDetails = new DeliverDetails(pharmacyName, driverName, distributorId, pharmacyId, driverId,  randomId);
 
-                    databaseReference.child("pharmacies").child(pharmacyId).child("pharmacyName").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            pharmacyName = dataSnapshot.getValue().toString();
-                            databaseReference.child("userInfo").child(driverId).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot tataSnapshot) {
-                                    driverName = tataSnapshot.getValue().toString();
-
-                                    DeliverDetails deliverDetails = new DeliverDetails(pharmacyName, driverName, distributorId,  pharmacyId, driverId, randomId);
-
-                                    deliveryList.add(deliverDetails);
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
+                    deliveryList.add(deliverDetails);
                 }
 
                 customListAdapter = new CustomListAdapter(getContext(), R.layout.simplerow, deliveryList);

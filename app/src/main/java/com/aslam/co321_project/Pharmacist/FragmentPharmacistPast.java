@@ -34,9 +34,6 @@ public class FragmentPharmacistPast extends Fragment {
 
     private ListView myListView;
 
-    private String distributorName;
-    private String driverName;
-
     public FragmentPharmacistPast() {
         // Required empty public constructor
     }
@@ -53,32 +50,11 @@ public class FragmentPharmacistPast extends Fragment {
                     final String distributorId = tempSnapShot.child("distributorId").getValue().toString();
                     final String randomId = tempSnapShot.child("randomId").getValue().toString();
 
-                    databaseReference.child("distributors").child(distributorId).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            distributorName = dataSnapshot.child("shopName").getValue().toString();
-                            databaseReference.child("userInfo").child(driverId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    driverName = dataSnapshot.child("name").getValue().toString();
+                    final String distributorName = tempSnapShot.child("distributorName").getValue().toString();
+                    final String driverName = tempSnapShot.child("driverName").getValue().toString();
+                    DeliverDetails deliverDetails = new DeliverDetails(distributorName, driverName, distributorId, pharmacyId, driverId,  randomId);
 
-                                    DeliverDetails deliverDetails = new DeliverDetails(distributorName, driverName, distributorId, pharmacyId, driverId, randomId);
-
-                                    deliveryList.add(deliverDetails);
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
+                    deliveryList.add(deliverDetails);
                 }
 
                 customListAdapter = new CustomListAdapter(getContext(), R.layout.simplerow, deliveryList);

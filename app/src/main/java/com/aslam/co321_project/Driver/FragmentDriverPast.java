@@ -52,24 +52,10 @@ public class FragmentDriverPast extends Fragment {
                     final String distributorId = tempSnapShot.child("distributorId").getValue().toString();
                     final String randomId = tempSnapShot.child("randomId").getValue().toString();
 
-                    databaseReference.child("pharmacies").child(pharmacyId).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            pharmacyName = dataSnapshot.child("pharmacyName").getValue().toString();
-                            String address = dataSnapshot.child("pharmacyAddress").getValue().toString();
-                            String [] splittedBoxArray = address.split("\\s+");
-                            cityName = splittedBoxArray[splittedBoxArray.length-1];
-
-                            DeliverDetails deliverDetails = new DeliverDetails(pharmacyName, cityName, distributorId, driverId, pharmacyId, randomId);
-
-                            deliveryList.add(deliverDetails);
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
+                    final String pharmacyName = tempSnapShot.child("pharmacyName").getValue().toString();
+                    final String cityName = tempSnapShot.child("cityName").getValue().toString();
+                    DeliverDetails deliverDetails = new DeliverDetails(pharmacyName, cityName, distributorId, pharmacyId, driverId,  randomId);
+                    deliveryList.add(deliverDetails);
                 }
 
                 customListAdapter = new CustomListAdapter(getContext(), R.layout.simplerow, deliveryList);
