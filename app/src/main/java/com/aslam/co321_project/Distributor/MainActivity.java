@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean loadFragment(Fragment fragment) {
         if(fragment!=null){
+            //TODO: destroy Fragment Home
             getSupportFragmentManager().beginTransaction().replace(R.id.distributor_fragment_container, fragment).commit();
             return true;
         }

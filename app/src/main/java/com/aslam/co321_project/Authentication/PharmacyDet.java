@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.aslam.co321_project.R;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -51,6 +52,19 @@ public class PharmacyDet extends AppCompatActivity {
                     ulpoadPharmacyInfo();
                 } catch (Exception e){
                     Toast.makeText(PharmacyDet.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        Button btnAddCoordinates = findViewById(R.id.buttonAddCoordinate);
+        final MapView mapViewPharmacy = findViewById(R.id.mapViewPharmacy);
+        btnAddCoordinates.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mapViewPharmacy.getVisibility()==View.VISIBLE){
+                    mapViewPharmacy.setVisibility(View.GONE);
+                } else {
+                    mapViewPharmacy.setVisibility(View.VISIBLE);
                 }
             }
         });

@@ -1,30 +1,40 @@
 package com.aslam.co321_project.Common;
 
 public class DeliverDetails {
-    private String rightId;
     private String title;
     private String subTitle;
-    private String leftId;
+    private String distributorId;
+    private String pharmacyId;
+    private String driverId;
     private String randomId;
 
-    public DeliverDetails(String title, String subTitle, String leftId, String rightId, String randomId) {
-        this.title = title;
-        this.subTitle = subTitle;
-        this.leftId = leftId;
-        this.randomId = randomId;
-        this.rightId = rightId;
+
+    public DeliverDetails() {
     }
 
-    public String getLeftId() {
-        return leftId;
+    public DeliverDetails(String title, String subTitle, String distributorId, String pharmacyId, String driverId, String randomId) {
+        this.title = title;
+        this.subTitle = subTitle;
+        this.distributorId = distributorId;
+        this.pharmacyId = pharmacyId;
+        this.driverId = driverId;
+        this.randomId = randomId;
+    }
+
+    public String getPharmacyId() {
+        return pharmacyId;
+    }
+
+    public String getDriverId() {
+        return driverId;
+    }
+
+    public String getDistributorId() {
+        return distributorId;
     }
 
     public String getRandomId() {
         return randomId;
-    }
-
-    public String getRightId() {
-        return rightId;
     }
 
     public String getSubTitle() {

@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.aslam.co321_project.Common.BoxList;
+import com.aslam.co321_project.Common.UploadDeliveryDetails;
 import com.aslam.co321_project.R;
 import com.aslam.co321_project.Common.TaskClass;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -38,12 +40,20 @@ import static com.aslam.co321_project.Distributor.MainActivity.databaseReference
 //TODO: this activity has some bugs
 public class FragmentDistributorAssignWork extends Fragment {
 
-    DatabaseReference userInfoReference;
-    View view;
-    Spinner driverSpinner, pharmacySpinner;
+    private DatabaseReference userInfoReference;
+    private View view;
+    private EditText etBoxes;
+
+    private Spinner driverSpinner, pharmacySpinner;
     private HashMap<Integer, String> driverMap = new HashMap<>();
     private HashMap<Integer, String> pharmacyMap = new HashMap<>();
 
+    private BoxList boxList;
+    private String distributorId = MainActivity.uid;
+    private String selectedDriverId;
+    private String selectedPharmacyId;
+    private String randomId;
+    private UploadDeliveryDetails uploadDeliveryDetails;
 
     public FragmentDistributorAssignWork() {
         // Required empty public constructor
@@ -70,7 +80,7 @@ public class FragmentDistributorAssignWork extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_distributor_assign_work, container, false);
 
-        final EditText etBoxes = view.findViewById(R.id.etAsnWrkBoxes);
+        etBoxes = view.findViewById(R.id.etAsnWrkBoxes);
         final Button btnAdd = view.findViewById(R.id.btnAsnWrk);
 
         btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -82,10 +92,30 @@ public class FragmentDistributorAssignWork extends Fragment {
                     etBoxes.requestFocus();
                 } else {
                     String [] splittedBoxArray = boxes.split("\\s+");
-                    List<String> splittedBoxList = Arrays.asList(splittedBoxArray);
+
+                    //create the box list object
+                    switch (splittedBoxArray.length){
+                        case 1:
+                            boxList = new BoxList(splittedBoxArray[0]);
+                            break;
+                        case 2:
+                            boxList = new BoxList(splittedBoxArray[0], splittedBoxArray[1]);
+                            break;
+                        case 3:
+                            boxList = new BoxList(splittedBoxArray[0], splittedBoxArray[1], splittedBoxArray[2]);
+                            break;
+                        case 4:
+                            boxList = new BoxList(splittedBoxArray[0], splittedBoxArray[1], splittedBoxArray[2], splittedBoxArray[3]);
+                            break;
+                        case 5:
+                            boxList = new BoxList(splittedBoxArray[0], splittedBoxArray[1], splittedBoxArray[2], splittedBoxArray[3], splittedBoxArray[4]);
+                            break;
+                        default:
+                            boxList = new BoxList(splittedBoxArray[0], splittedBoxArray[1], splittedBoxArray[2], splittedBoxArray[3], splittedBoxArray[4], splittedBoxArray[5]);
+                    }
 
                     try {
-                        uploadData(splittedBoxList);
+                        uploadData(boxList);
                     } catch (Exception e){
                         Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -174,37 +204,67 @@ public class FragmentDistributorAssignWork extends Fragment {
         });
     }
 
-    private void uploadData(List splittedBoxList) {
-        long tempDriverId = driverSpinner.getSelectedItemId();
-        long tempPharmacyId = pharmacySpinner.getSelectedItemId();
+    private void setPharmacyTask(){
+        databaseReference.child("pharmacyTask").child(selectedPharmacyId).child("ongoingDeliveries").child(randomId).setValue(uploadDeliveryDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                setDistributorTask();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                setPharmacyTask();
+            }
+        });
+    }
 
-        final String selectedDriverId = driverMap.get((int)tempDriverId);
-        final String selectedPharmacyId = pharmacyMap.get((int)tempPharmacyId);
+    private void setDriverTask(){
+        databaseReference.child("driverTask").child(selectedDriverId).child("ongoingDeliveries").child(randomId).setValue(uploadDeliveryDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                setPharmacyTask();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                setDriverTask();
+            }
+        });
+    }
 
-        String selectedDriverName = driverSpinner.getSelectedItem().toString();
-        String selectedPharmacyName = pharmacySpinner.getSelectedItem().toString();
-        UploadDeliveryDetails uploadDeliveryDetails = new UploadDeliveryDetails(selectedDriverName, selectedPharmacyName, selectedPharmacyId, selectedDriverId, splittedBoxList);
-
-        final String randomId = UUID.randomUUID().toString();
-        databaseReference.child("ongoingDeliveries/"+ MainActivity.uid+"/").child(randomId).setValue(uploadDeliveryDetails)
+    private void setDistributorTask(){
+        databaseReference.child("distributorTask").child(distributorId).child("ongoingDeliveries").child(randomId).setValue(uploadDeliveryDetails)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(getContext(), "added", Toast.LENGTH_SHORT).show();
+                        driverSpinner.setSelection(0);
+                        pharmacySpinner.setSelection(0);
+                        etBoxes.getText().clear();
+                        Toast.makeText(getContext(), "Added", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+                        setDistributorTask();
+                    }
                 });
-
-        TaskClass taskClass = new TaskClass(MainActivity.uid, randomId);
-        databaseReference.child("driverTask").child(selectedDriverId).child(randomId).setValue(taskClass);
-        databaseReference.child("pharmacyTask").child(selectedPharmacyId).child(randomId).setValue(taskClass);
-        databaseReference.child("distributorTask").child(MainActivity.uid).child(randomId).child("randomId").setValue(randomId);
     }
 
+    private void uploadData(BoxList boxList) {
+        long tempDriverId = driverSpinner.getSelectedItemId();
+        long tempPharmacyId = pharmacySpinner.getSelectedItemId();
 
+        selectedDriverId = driverMap.get((int) tempDriverId);
+        selectedPharmacyId = pharmacyMap.get((int) tempPharmacyId);
+
+        randomId = UUID.randomUUID().toString();
+        uploadDeliveryDetails = new UploadDeliveryDetails(distributorId, selectedPharmacyId, selectedDriverId, randomId, boxList);
+
+        try {
+            setDriverTask();
+        } catch (Exception e){
+            Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
 }

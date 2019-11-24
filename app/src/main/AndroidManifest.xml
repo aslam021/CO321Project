@@ -6,9 +6,13 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Project"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -16,31 +20,27 @@
         android:theme="@style/AppTheme.ProfileTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-
-        <!-- Authentication activities -->
+        <meta-data
+            android:name="com.here.android.maps.appid"
+            android:value="A9TcrRAJRYLYRBx890Z" />
+        <meta-data
+            android:name="com.here.android.maps.apptoken"
+            android:value="ZRfBG5RHW5VDhaFxvyPYLA" /> <!-- Authentication activities -->
         <activity android:name=".Authentication.DistributorShopDetail" />
         <activity android:name=".Authentication.PharmacyDet" />
         <activity android:name=".Authentication.finishReg" />
         <activity android:name=".Authentication.AddAPhoto" />
         <activity android:name=".Authentication.SignUp" />
-        <activity android:name=".Authentication.logIn" />
-
-        <!-- Distributor activities -->
+        <activity android:name=".Authentication.logIn" /> <!-- Distributor activities -->
         <activity
             android:name=".Distributor.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-
-        <!-- Pharmacist activities -->
+            android:theme="@style/AppTheme.NoActionBar" /> <!-- Pharmacist activities -->
         <activity
             android:name=".Pharmacist.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-
-        <!-- Driver activities -->
+            android:theme="@style/AppTheme.NoActionBar" /> <!-- Driver activities -->
         <activity
             android:name=".Driver.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-
-        <!--Common activities-->
+            android:theme="@style/AppTheme.NoActionBar" /> <!-- Common activities -->
         <activity android:name=".Common.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

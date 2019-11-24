@@ -18,13 +18,13 @@ public class Pharmacy {
         this.pharmacyId = pharmacyId;
     }
 
-    public Pharmacy(String pharmacyId, String pharmacyName, String pharmacyPhone, String pharmacyAddress, String longatude, String latitude) {
+    public Pharmacy(String pharmacyId, String pharmacyName, String pharmacyPhone, String pharmacyAddress, String latitude, String longitude) {
         this.pharmacyName = pharmacyName;
         this.pharmacyPhone = pharmacyPhone;
         this.pharmacyAddress = pharmacyAddress;
         this.pharmacyId = pharmacyId;
-        this.longitude = longatude;
         this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public String getPharmacyName() {

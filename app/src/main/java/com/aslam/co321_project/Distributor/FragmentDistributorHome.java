@@ -21,7 +21,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static com.aslam.co321_project.Distributor.MainActivity.databaseReference;
 
@@ -34,12 +33,13 @@ public class FragmentDistributorHome extends Fragment {
     private ListView myListView;
     private CustomListAdapter customListAdapter;
     private ArrayList<DeliverDetails> deliveryList = new ArrayList<>();
-    private HashMap<Integer, String> randomIdMap;
+
+    private String pharmacyName;
+    private String driverName;
 
     public FragmentDistributorHome() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,7 +68,7 @@ public class FragmentDistributorHome extends Fragment {
 //        });
 
         try {
-            getPaths();
+            setListView();
         } catch (Exception e){
             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -77,11 +77,10 @@ public class FragmentDistributorHome extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 Intent intent = new Intent(getContext(), ViewDistribution.class);
-                intent.putExtra("nameToDisplay", deliveryList.get(position).getTitle());
-                intent.putExtra("pharmacyId", deliveryList.get(position).getRightId());
-                intent.putExtra("distributorId", MainActivity.uid);
+                intent.putExtra("distributorId", deliveryList.get(position).getDistributorId());
+                intent.putExtra("pharmacyId", deliveryList.get(position).getPharmacyId());
+                intent.putExtra("driverId", deliveryList.get(position).getDriverId());
                 intent.putExtra("randomId", deliveryList.get(position).getRandomId());
-                intent.putExtra("driverId", deliveryList.get(position).getLeftId());
                 startActivity(intent);
             }
         });
@@ -89,18 +88,48 @@ public class FragmentDistributorHome extends Fragment {
         return view;
     }
 
-    private void getPaths() {
-        databaseReference.child("distributorTask").child(MainActivity.uid).addValueEventListener(new ValueEventListener() {
+    private void setListView() {
+        final String distributorId = MainActivity.uid;
+        databaseReference.child("distributorTask").child(distributorId).child("ongoingDeliveries").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                randomIdMap = new HashMap<>();
-                int i = 0;
-                for (DataSnapshot deliverySnapShot : dataSnapshot.getChildren()) {
-                    String randomId = deliverySnapShot.child("randomId").getValue().toString();
-                    randomIdMap.put(i, randomId);
-                    i++;
+                deliveryList.clear();
+                for(DataSnapshot tempSnapShot: dataSnapshot.getChildren()){
+                    final String pharmacyId = tempSnapShot.child("pharmacyId").getValue().toString();
+                    final String driverId = tempSnapShot.child("driverId").getValue().toString();
+                    final String randomId = tempSnapShot.child("randomId").getValue().toString();
+
+
+                    databaseReference.child("pharmacies").child(pharmacyId).child("pharmacyName").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            pharmacyName = dataSnapshot.getValue().toString();
+                            databaseReference.child("userInfo").child(driverId).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot tataSnapshot) {
+                                    driverName = tataSnapshot.getValue().toString();
+
+                                    DeliverDetails deliverDetails = new DeliverDetails(pharmacyName, driverName, distributorId, pharmacyId, driverId,  randomId);
+
+                                    deliveryList.add(deliverDetails);
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
-                setListView();
+
+                customListAdapter = new CustomListAdapter(getContext(), R.layout.simplerow, deliveryList);
+                myListView.setAdapter(customListAdapter);
             }
 
             @Override
@@ -110,34 +139,6 @@ public class FragmentDistributorHome extends Fragment {
         });
     }
 
-    //retrieve data from firebase and set ListView
-    private void setListView() {
-        final String distributorId = MainActivity.uid;
-        for(int i = 0; i<randomIdMap.size(); i++){
-            final String randomId = randomIdMap.get(i);
-            databaseReference.child("ongoingDeliveries").child(distributorId).child(randomId).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    final String pharmacyName = dataSnapshot.child("pharmacyName").getValue().toString();
-                    final String pharmacyId = dataSnapshot.child("pharmacyId").getValue().toString();
-                    String driverName = dataSnapshot.child("driverName").getValue().toString();
-                    String driverId = dataSnapshot.child("driverId").getValue().toString();
-                    DeliverDetails deliverDetails = new DeliverDetails(pharmacyName, driverName, driverId, pharmacyId, randomId);
-
-                    deliveryList.add(deliverDetails);
-
-                    customListAdapter = new CustomListAdapter(getContext(), R.layout.simplerow, deliveryList);
-                    myListView.setAdapter(customListAdapter);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        }
-    }
 }
-
 
 

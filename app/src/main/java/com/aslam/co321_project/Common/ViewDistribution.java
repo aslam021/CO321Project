@@ -1,9 +1,13 @@
 package com.aslam.co321_project.Common;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,11 +35,10 @@ import java.util.LinkedList;
 
 public class ViewDistribution extends AppCompatActivity {
 
-    private String nameToDisplay;
     private String distributorId;
-    private String randomId;
     private String pharmacyId;
     private String driverId;
+    private String randomId;
     private String phoneLeft = "";
     private String phoneRight = "";
 
@@ -127,8 +130,72 @@ public class ViewDistribution extends AppCompatActivity {
 
     private void setupTheActivity() {
 
+        if(logIn.type.equals("Pharmacist")){
+            getBoxDataPharmacy();
+            getDistributorAddress();
+            getDistributorPhone();
+            getDriverPhone();
+
+        }
+        else {
+            getPharmacyAddress();
+            getPharmacyPhone();
+
+            if(logIn.type.equals("Driver")){
+                getBoxDataDriver();
+                getDistributorPhone();
+                if(MainActivity.homeSelected){
+                    handleFloatingButton();
+                    handleDeliverButton();
+                }
+            } else {
+                getBoxDataDistributor();
+                getDriverPhone();
+            }
+        }
+
+    }
+
+    @SuppressLint("RestrictedApi")
+    private void handleFloatingButton() {
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setVisibility(View.VISIBLE);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                databaseReference.child("pharmacies").child(pharmacyId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        String latitude = dataSnapshot.child("latitude").getValue().toString();
+                        String longitude = dataSnapshot.child("longitude").getValue().toString();
+
+                        if(latitude.length()>0 && longitude.length()>0){
+                            try {
+                                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + latitude + "," + longitude);
+                                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                                mapIntent.setPackage("com.google.android.apps.maps");
+                                startActivity(mapIntent);
+                            } catch (Exception e){
+                                Toast.makeText(ViewDistribution.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(ViewDistribution.this, "Sorry, Location is not provided", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        });
+
+    }
+
+    private void getBoxDataDriver() {
         //get the box list
-        databaseReference.child("ongoingDeliveries").child(distributorId).child(randomId).child("boxList").addValueEventListener(new ValueEventListener() {
+        databaseReference.child("driverTask").child(MainActivity.uid).child("ongoingDeliveries").child(randomId).child("boxList").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 linkedList = new LinkedList<>();
@@ -145,24 +212,48 @@ public class ViewDistribution extends AppCompatActivity {
 
             }
         });
+    }
 
-        if(logIn.type.equals("Pharmacist")){
-            getDistributorAddress();
-            getDistributorPhone();
-            getDriverPhone();
+    private void getBoxDataDistributor() {
+        //get the box list
+        databaseReference.child("distributorTask").child(distributorId).child("ongoingDeliveries").child(randomId).child("boxList").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                linkedList = new LinkedList<>();
+                for(DataSnapshot myDataSnapshot: dataSnapshot.getChildren()){
+                    linkedList.add(myDataSnapshot.getValue().toString());
+                }
 
-        } else {
-            getPharmacyAddress();
-            getPharmacyPhone();
-
-            if(logIn.type.equals("Driver")){
-                getDistributorPhone();
-                if(MainActivity.homeSelected) handleDeliverButton();
-            } else {
-                getDriverPhone();
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(ViewDistribution.this, android.R.layout.simple_list_item_1, linkedList);
+                listView.setAdapter(adapter);
             }
-        }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getBoxDataPharmacy() {
+        //get the box list
+        databaseReference.child("pharmacyTask").child(pharmacyId).child("ongoingDeliveries").child(randomId).child("boxList").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                linkedList = new LinkedList<>();
+                for(DataSnapshot myDataSnapshot: dataSnapshot.getChildren()){
+                    linkedList.add(myDataSnapshot.getValue().toString());
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(ViewDistribution.this, android.R.layout.simple_list_item_1, linkedList);
+                listView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void getPharmacyPhone() {
@@ -170,6 +261,7 @@ public class ViewDistribution extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String phonePharmacy = dataSnapshot.child("phone").getValue().toString();
+
                 if(phoneRight.length()==0){
                     buttonRightCall.setText(" Pharmacy ");
                     phoneRight = phonePharmacy;
@@ -207,33 +299,13 @@ public class ViewDistribution extends AppCompatActivity {
         });
     }
 
-    private void getDistributorPhone() {
-        databaseReference.child("userInfo").child(distributorId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String phoneDistributor = dataSnapshot.child("phone").getValue().toString();
-                if(phoneRight.length()==0){
-                    buttonRightCall.setText(" Distributor ");
-                    phoneRight = phoneDistributor;
-                } else {
-                    buttonLeftCall.setText(" Distributor ");
-                    phoneLeft = phoneDistributor;
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
     private void getPharmacyAddress() {
         databaseReference.child("pharmacies").child(pharmacyId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String addressToDisplay = dataSnapshot.child("pharmacyAddress").getValue().toString();
-                textView.setText("This boxes are transported to\n" + nameToDisplay +"\n"+ addressToDisplay);
+                String pharmacyName = dataSnapshot.child("pharmacyName").getValue().toString();
+                textView.setText("This boxes are transported to\n" + pharmacyName +"\n"+ addressToDisplay);
             }
 
             @Override
@@ -248,7 +320,29 @@ public class ViewDistribution extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String addressToDisplay = dataSnapshot.child("shopAddress").getValue().toString();
-                textView.setText("This boxes are distributed by\n" + nameToDisplay +"\n"+ addressToDisplay);
+                String shopName = dataSnapshot.child("shopName").getValue().toString();
+                textView.setText("This boxes are distributed by\n" + shopName +"\n"+ addressToDisplay);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getDistributorPhone() {
+        databaseReference.child("userInfo").child(distributorId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String phoneDistributor = dataSnapshot.child("phone").getValue().toString();
+                if(phoneRight.length()==0){
+                    buttonRightCall.setText(" Distributor ");
+                    phoneRight = phoneDistributor;
+                } else {
+                    buttonLeftCall.setText(" Distributor ");
+                    phoneLeft = phoneDistributor;
+                }
             }
 
             @Override
@@ -284,57 +378,103 @@ public class ViewDistribution extends AppCompatActivity {
 
     //method to execute when delivered button is clicked
     private void handleDelivered() {
-        TaskClass taskClass = new TaskClass(distributorId, randomId);
-        databaseReference.child("deliveredSupplies").child("driverTask").child(MainActivity.uid).child(randomId).setValue(taskClass);
-        databaseReference.child("deliveredSupplies").child("pharmacyTask").child(pharmacyId).child(randomId).setValue(taskClass);
-        databaseReference.child("deliveredSupplies").child("distributorTask").child(distributorId).child(randomId).child("randomId").setValue(randomId);
+        //update & delete one by one
+        updateDistributor();
+    }
 
-        databaseReference.child("pharmacyTask").child(pharmacyId).child(randomId).removeValue()
+    private void updateDistributor() {
+        UploadDeliveryDetails uploadDeliveryDetails = new UploadDeliveryDetails(distributorId, pharmacyId, driverId, randomId, linkedList);
+
+        databaseReference.child("distributorTask").child(distributorId).child("pastDeliveries").child(randomId).setValue(uploadDeliveryDetails).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                updatePharmacist();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                updateDistributor();
+            }
+        });
+    }
+
+    private void updatePharmacist() {
+        UploadDeliveryDetails uploadDeliveryDetails = new UploadDeliveryDetails(distributorId, pharmacyId, driverId, randomId, linkedList);
+
+        databaseReference.child("pharmacyTask").child(pharmacyId).child("pastDeliveries").child(randomId).setValue(uploadDeliveryDetails)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        databaseReference.child("distributorTask").child(distributorId).child(randomId).removeValue()
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        databaseReference.child("driverTask").child(MainActivity.uid).child(randomId).removeValue()
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Toast.makeText(ViewDistribution.this, "Success", Toast.LENGTH_SHORT).show();
-                                                        Intent intent = new Intent(ViewDistribution.this, MainActivity.class);
-                                                        intent.putExtra("uid", MainActivity.uid);
-                                                        finish();
-                                                        startActivity(intent);
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Toast.makeText(ViewDistribution.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                                        databaseReference.child("pharmacyTask").child(pharmacyId).child(randomId).child("randomId").setValue(randomId);
-                                                        databaseReference.child("pharmacyTask").child(pharmacyId).child(randomId).child("distributorId").setValue(distributorId);
-                                                        databaseReference.child("distributorTask").child(distributorId).child(randomId).child("randomId").setValue(randomId);
-                                                    }
-                                                });
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(ViewDistribution.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                        databaseReference.child("pharmacyTask").child(pharmacyId).child(randomId).child("randomId").setValue(randomId);
-                                        databaseReference.child("pharmacyTask").child(pharmacyId).child(randomId).child("distributorId").setValue(distributorId);
-                                    }
-                                });
+                        updateDriver();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ViewDistribution.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        updatePharmacist();
                     }
                 });
+    }
+
+    private void updateDriver() {
+        UploadDeliveryDetails uploadDeliveryDetails = new UploadDeliveryDetails(distributorId, pharmacyId, driverId, randomId, linkedList);
+
+        databaseReference.child("driverTask").child(MainActivity.uid).child("pastDeliveries").child(randomId).setValue(uploadDeliveryDetails)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        deleteDistributor();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        updateDriver();
+                    }
+                });
+    }
+
+    private void deleteDistributor() {
+        databaseReference.child("distributorTask").child(distributorId).child("ongoingDeliveries").child(randomId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                deletePharmacist();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                deleteDistributor();
+            }
+        });
+    }
+
+    private void deletePharmacist() {
+        databaseReference.child("pharmacyTask").child(pharmacyId).child("ongoingDeliveries").child(randomId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                deleteDriver();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                deletePharmacist();
+            }
+        });
+    }
+
+    private void deleteDriver() {
+        databaseReference.child("driverTask").child(MainActivity.uid).child("ongoingDeliveries").child(randomId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(ViewDistribution.this, "Done", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                deleteDriver();
+            }
+        });
     }
 
     private void toolBarHandler() {
@@ -351,7 +491,6 @@ public class ViewDistribution extends AppCompatActivity {
 
     //get parameters from previous activity
     private void getParams() {
-        nameToDisplay = getIntent().getStringExtra("nameToDisplay");
         pharmacyId = getIntent().getStringExtra("pharmacyId");
         distributorId = getIntent().getStringExtra("distributorId");
         driverId = getIntent().getStringExtra("driverId");

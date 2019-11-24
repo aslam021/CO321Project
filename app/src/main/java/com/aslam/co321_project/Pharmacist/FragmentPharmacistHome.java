@@ -21,7 +21,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static com.aslam.co321_project.Pharmacist.MainActivity.databaseReference;
 
@@ -31,8 +30,8 @@ import static com.aslam.co321_project.Pharmacist.MainActivity.databaseReference;
 public class FragmentPharmacistHome extends Fragment {
 
     private ArrayList<DeliverDetails> deliveryList = new ArrayList<>();
-    private HashMap<Integer, String> distributorIdMap;
-    private HashMap<Integer, String> randomIdMap;
+    private String distributorName;
+    private String driverName;
 
     private CustomListAdapter customListAdapter;
 
@@ -44,54 +43,37 @@ public class FragmentPharmacistHome extends Fragment {
         // Required empty public constructor
     }
 
-    private void getPaths() {
-        databaseReference.child("pharmacyTask").child(MainActivity.uid).addValueEventListener(new ValueEventListener() {
+    private void setListView() {
+        final String pharmacyId = MainActivity.uid;
+        databaseReference.child("pharmacyTask").child(pharmacyId).child("ongoingDeliveries").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                distributorIdMap = new HashMap<>();
-                randomIdMap = new HashMap<>();
-                int i = 0;
-                for (DataSnapshot deliverySnapShot : dataSnapshot.getChildren()) {
-                    String distributorId = deliverySnapShot.child("distributorId").getValue().toString();
-                    String randomId = deliverySnapShot.child("randomId").getValue().toString();
-                    distributorIdMap.put(i, distributorId);
-                    randomIdMap.put(i, randomId);
-                    i++;
-                }
-                setListView();
-            }
+                deliveryList.clear();
+                for(DataSnapshot tempSnapShot: dataSnapshot.getChildren()){
+                    final String pharmacyId = tempSnapShot.child("pharmacyId").getValue().toString();
+                    final String driverId = tempSnapShot.child("driverId").getValue().toString();
+                    final String distributorId = tempSnapShot.child("distributorId").getValue().toString();
+                    final String randomId = tempSnapShot.child("randomId").getValue().toString();
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    //retrieve data from firebase and set ListView
-    private void setListView() {
-
-        for (int i = 0; i<randomIdMap.size(); i++){
-            final String distributorId = distributorIdMap.get(i);
-            final String randomId = randomIdMap.get(i);
-
-            databaseReference.child("distributors").child(distributorId).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    final String distributorName = dataSnapshot.child("shopName").getValue().toString();
-
-                    databaseReference.child("ongoingDeliveries").child(distributorId).child(randomId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    databaseReference.child("distributors").child(distributorId).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            String driverName = dataSnapshot.child("driverName").getValue().toString();
-                            driverId = dataSnapshot.child("driverId").getValue().toString();
+                            distributorName = dataSnapshot.child("shopName").getValue().toString();
+                            databaseReference.child("userInfo").child(driverId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    driverName = dataSnapshot.child("name").getValue().toString();
 
-                            DeliverDetails deliverDetails = new DeliverDetails(distributorName, driverName, distributorId, driverId, randomId);
+                                    DeliverDetails deliverDetails = new DeliverDetails(distributorName, driverName, distributorId, pharmacyId, driverId, randomId);
 
-                            deliveryList.add(deliverDetails);
+                                    deliveryList.add(deliverDetails);
+                                }
 
-                            customListAdapter = new CustomListAdapter(getContext(), R.layout.simplerow, deliveryList);
-                            myListView.setAdapter(customListAdapter);
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
                         }
 
                         @Override
@@ -101,12 +83,15 @@ public class FragmentPharmacistHome extends Fragment {
                     });
                 }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+                customListAdapter = new CustomListAdapter(getContext(), R.layout.simplerow, deliveryList);
+                myListView.setAdapter(customListAdapter);
+            }
 
-                }
-            });
-        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 
@@ -120,7 +105,7 @@ public class FragmentPharmacistHome extends Fragment {
 
         try {
             //setlistview
-            getPaths();
+            setListView();
         } catch (Exception e){
             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -129,11 +114,10 @@ public class FragmentPharmacistHome extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getContext(), ViewDistribution.class);
-                intent.putExtra("nameToDisplay", deliveryList.get(position).getTitle());
-                intent.putExtra("pharmacyId", MainActivity.uid);
-                intent.putExtra("distributorId", deliveryList.get(position).getLeftId());
+                intent.putExtra("distributorId", deliveryList.get(position).getDistributorId());
+                intent.putExtra("pharmacyId", deliveryList.get(position).getPharmacyId());
+                intent.putExtra("driverId", deliveryList.get(position).getDriverId());
                 intent.putExtra("randomId", deliveryList.get(position).getRandomId());
-                intent.putExtra("driverId", deliveryList.get(position).getRightId());
                 startActivity(intent);
             }
         });
