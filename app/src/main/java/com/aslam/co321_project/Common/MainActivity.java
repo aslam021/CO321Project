@@ -5,6 +5,10 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.aslam.co321_project.Authentication.logIn;
@@ -21,6 +25,19 @@ public class MainActivity extends AppCompatActivity {
 
     String type;
     String uid;
+    private ImageView logoImage;
+    private Animation animBlink;
+
+
+    @Override
+    protected void onStart() {
+        logoImage = findViewById(R.id.imageBlink);
+        animBlink = AnimationUtils.loadAnimation(getApplicationContext(),
+                R.anim.blink);
+
+        logoImage.startAnimation(animBlink);
+        super.onStart();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

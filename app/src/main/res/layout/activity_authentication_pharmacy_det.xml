@@ -20,7 +20,7 @@
             android:paddingTop="20dp"
             android:layout_margin="10dp"
             android:gravity="center_vertical"
-            android:textColor="@color/blueLogo"/>
+            android:textColor="@color/colorActionBar"/>
     </RelativeLayout>
 
 
@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="@color/blueLogo">
+        android:background="@color/colorActionBar">
 
         <LinearLayout
             android:layout_width="match_parent"

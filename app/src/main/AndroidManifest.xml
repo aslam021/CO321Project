@@ -19,6 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.ProfileTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".Driver.ViewDistributionDriver"></activity>
 
         <meta-data
             android:name="com.here.android.maps.appid"

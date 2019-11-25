@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#008577</color>
+    <color name="colorPrimary">#47406a</color>
+    <color name="colorPrimaryDark">#47406a</color> //logo color
+    <color name="colorAccent">#2b2740</color>
     <color name="bg">#8a94a8</color>
     <color name="bgAction"> #4c5567</color>
     <color name="whiteHash"> #c4c9d4</color>
     <color name="transparent"> #ffffff00</color>
     <color name="white"> #ffffff</color>
-    <color name="blueLogo"> #66c2ff </color>
+    <color name="colorActionBar"> #61609a </color>
     <color name="profilePrimaryDark">#FF3B30</color>
     <color name="profileAccentColor">#F7F7F7</color>
     <color name="whiteTextColor">#fff</color>

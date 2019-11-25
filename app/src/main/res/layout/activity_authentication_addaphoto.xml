@@ -6,7 +6,7 @@
     android:orientation="vertical"
     tools:context=".Authentication.AddAPhoto"
     android:gravity="center"
-    android:background="@color/blueLogo">
+    android:background="@color/colorActionBar">
 
 
     <LinearLayout

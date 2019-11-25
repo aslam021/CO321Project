@@ -20,5 +20,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:textSize="40dp"
-        android:textColor="@color/blueLogo"/>
+        android:textColor="@color/colorActionBar"/>
 </android.support.constraint.ConstraintLayout>

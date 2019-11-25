@@ -11,7 +11,7 @@
         android:id="@+id/driverToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/blueLogo"
+        android:background="@color/colorActionBar"
         app:layout_constraintBottom_toTopOf="@id/driver_fragment_container"
         app:popupTheme="@style/PopupOverlay"
         app:title="Surveil Pharma"

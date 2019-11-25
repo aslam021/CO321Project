@@ -13,7 +13,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.aslam.co321_project.Common.BoxList;
 import com.aslam.co321_project.Common.UploadDeliveryDetails;
 import com.aslam.co321_project.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -24,7 +23,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,7 +47,6 @@ public class FragmentDistributorAssignWork extends Fragment {
     private HashMap<Integer, String> driverMap = new HashMap<>();
     private HashMap<Integer, String> pharmacyMap = new HashMap<>();
 
-    private BoxList boxList;
     private String distributorId = MainActivity.uid;
     private String selectedDriverId;
     private String selectedPharmacyId;
@@ -55,6 +55,7 @@ public class FragmentDistributorAssignWork extends Fragment {
     private String pharmacyName;
     private String driverName;
     private String cityName;
+    private String boxes;
     private UploadDeliveryDetails uploadDeliveryDetails;
 
     public FragmentDistributorAssignWork() {
@@ -88,36 +89,14 @@ public class FragmentDistributorAssignWork extends Fragment {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String boxes = etBoxes.getText().toString();
+                boxes = etBoxes.getText().toString();
                 if (boxes.isEmpty()){
                     etBoxes.setError("at least one box is required");
                     etBoxes.requestFocus();
                 } else {
-                    String [] splittedBoxArray = boxes.split("\\s+");
-
-                    //create the box list object
-                    switch (splittedBoxArray.length){
-                        case 1:
-                            boxList = new BoxList(splittedBoxArray[0]);
-                            break;
-                        case 2:
-                            boxList = new BoxList(splittedBoxArray[0], splittedBoxArray[1]);
-                            break;
-                        case 3:
-                            boxList = new BoxList(splittedBoxArray[0], splittedBoxArray[1], splittedBoxArray[2]);
-                            break;
-                        case 4:
-                            boxList = new BoxList(splittedBoxArray[0], splittedBoxArray[1], splittedBoxArray[2], splittedBoxArray[3]);
-                            break;
-                        case 5:
-                            boxList = new BoxList(splittedBoxArray[0], splittedBoxArray[1], splittedBoxArray[2], splittedBoxArray[3], splittedBoxArray[4]);
-                            break;
-                        default:
-                            boxList = new BoxList(splittedBoxArray[0], splittedBoxArray[1], splittedBoxArray[2], splittedBoxArray[3], splittedBoxArray[4], splittedBoxArray[5]);
-                    }
 
                     try {
-                        uploadData(boxList);
+                        uploadData();
                     } catch (Exception e){
                         Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -253,7 +232,7 @@ public class FragmentDistributorAssignWork extends Fragment {
                 });
     }
 
-    private void uploadData(BoxList boxList) {
+    private void uploadData() {
         long tempDriverId = driverSpinner.getSelectedItemId();
         long tempPharmacyId = pharmacySpinner.getSelectedItemId();
 
@@ -304,9 +283,13 @@ public class FragmentDistributorAssignWork extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 driverName = dataSnapshot.getValue().toString();
 
+                String [] splittedBoxArray = boxes.split("\\s+");
+
+                List<String> splittedBoxList = Arrays.asList(splittedBoxArray);
+
                 randomId = UUID.randomUUID().toString();
                 uploadDeliveryDetails = new UploadDeliveryDetails(distributorName, pharmacyName, driverName, cityName,
-                        distributorId, selectedPharmacyId, selectedDriverId, randomId, boxList);
+                        distributorId, selectedPharmacyId, selectedDriverId, randomId, splittedBoxList);
 
                 try {
                     setDriverTask();

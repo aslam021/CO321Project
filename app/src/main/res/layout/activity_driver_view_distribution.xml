@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Common.ViewDistribution"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".Driver.ViewDistributionDriver">
 
     <android.widget.Toolbar
-        android:id="@+id/toolbarBoxStatus"
+        android:id="@+id/toolbarBoxStatus_driver"
         android:minHeight="?attr/actionBarSize"
         android:background="@color/colorActionBar"
         android:layout_width="match_parent"
@@ -16,7 +17,7 @@
     </android.widget.Toolbar>
 
     <ListView
-        android:id="@+id/lvViewDistribution"
+        android:id="@+id/lvViewDistribution_driver"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="60"
@@ -26,71 +27,72 @@
 
     <android.support.design.widget.FloatingActionButton
         android:background="@color/colorActionBar"
-        android:id="@+id/fab"
+        android:id="@+id/fab_driver"
         android:visibility="gone"
+        android:backgroundTint="#008577"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:src="@drawable/ic_navigation_white_24dp"
         android:contentDescription="navigate"
         android:scaleType="center"
-        android:layout_margin="16dp" />
+        android:layout_marginRight="16dp"/>
 
     <Button
-        android:id="@+id/btnDelivered"
-        android:visibility="gone"
+        android:id="@+id/btnDelivered_driver"
         android:layout_width="match_parent"
+        android:visibility="gone"
         android:layout_height="wrap_content"
         android:text="Delivered"
-        android:layout_marginBottom="10dp"
         android:layout_marginRight="20dp"
         android:layout_marginLeft="20dp"
-        android:backgroundTint="@color/colorActionBar"/>
+        android:layout_marginBottom="5dp"
+        android:backgroundTint="#fa8282"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="2px"
         android:background="@drawable/layout_bg"/>
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/linearLayout2_driver"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="5dp"
-        android:layout_marginTop="10dp"
         android:gravity="center">
 
         <Button
             android:drawableLeft="@drawable/ic_call_black_24dp"
-            android:id="@+id/buttonLeftCall"
+            android:id="@+id/buttonDistributorCall_driver"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="15dp"
             android:padding="10dp"
-            android:text="  driver "
+            android:text="  Distributor "
             android:textStyle="normal"
             android:gravity="center"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:backgroundTint="#a29d44"/>
 
         <Button
+            android:backgroundTint="#a29d44"
             android:gravity="center"
             android:layout_gravity="center"
-            android:id="@+id/buttonRightCall"
+            android:id="@+id/buttonPharmacyCall_driver"
             android:drawableLeft="@drawable/ic_call_black_24dp"
             android:padding="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="5dp"
-            android:text="  pharmacy"
+            android:text="  Pharmacy "
             android:textStyle="normal"/>
 
     </LinearLayout>
 
     <TextView
-        android:padding="5dp"
-        android:id="@+id/tvTransInfo"
+        android:id="@+id/tvTransInfo_driver"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"

@@ -1,7 +1,7 @@
 package com.aslam.co321_project.Common;
 
 
-import java.util.LinkedList;
+import java.util.List;
 
 public class UploadDeliveryDetails {
     String distributorId;
@@ -12,14 +12,13 @@ public class UploadDeliveryDetails {
     String pharmacyName;
     String driverName;
     String cityName;
-    BoxList boxList;
-    LinkedList<String> linkedList;
+    List<String> boxList;
 
     public UploadDeliveryDetails() {
     }
 
     public UploadDeliveryDetails(String distributorName, String pharmacyName, String driverName, String cityName,
-                                 String distributorId, String pharmacyId, String driverId, String randomId, BoxList boxList) {
+                                 String distributorId, String pharmacyId, String driverId, String randomId, List<String> splittedBoxList) {
         this.distributorName = distributorName;
         this.pharmacyName = pharmacyName;
         this.driverName = driverName;
@@ -28,19 +27,6 @@ public class UploadDeliveryDetails {
         this.pharmacyId = pharmacyId;
         this.driverId = driverId;
         this.randomId = randomId;
-        this.boxList = boxList;
-    }
-
-    public UploadDeliveryDetails(String distributorName, String pharmacyName, String driverName, String cityName,
-                                 String distributorId, String pharmacyId, String driverId, String randomId, LinkedList<String> linkedList) {
-        this.distributorName = distributorName;
-        this.pharmacyName = pharmacyName;
-        this.driverName = driverName;
-        this.cityName = cityName;
-        this.distributorId = distributorId;
-        this.pharmacyId = pharmacyId;
-        this.driverId = driverId;
-        this.randomId = randomId;
-        this.linkedList = linkedList;
+        this.boxList = splittedBoxList;
     }
 }

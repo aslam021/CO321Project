@@ -14,14 +14,12 @@ import android.widget.Toast;
 
 import com.aslam.co321_project.Common.CustomListAdapter;
 import com.aslam.co321_project.Common.DeliverDetails;
-import com.aslam.co321_project.Common.ViewDistribution;
 import com.aslam.co321_project.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static com.aslam.co321_project.Driver.MainActivity.databaseReference;
 
@@ -32,8 +30,6 @@ public class FragmentDriverPast extends Fragment {
     private ArrayList<DeliverDetails> deliveryList = new ArrayList<>();
     private ListView myListView;
     private CustomListAdapter customListAdapter;
-    private String pharmacyName;
-    private String cityName;
 
     public FragmentDriverPast() {
         // Required empty public constructor
@@ -88,11 +84,12 @@ public class FragmentDriverPast extends Fragment {
         myListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getContext(), ViewDistribution.class);
+                Intent intent = new Intent(getContext(), ViewDistributionDriver.class);
                 intent.putExtra("distributorId", deliveryList.get(position).getDistributorId());
                 intent.putExtra("pharmacyId", deliveryList.get(position).getPharmacyId());
                 intent.putExtra("driverId", deliveryList.get(position).getDriverId());
                 intent.putExtra("randomId", deliveryList.get(position).getRandomId());
+                intent.putExtra("status", "past");
                 startActivity(intent);
             }
         });
