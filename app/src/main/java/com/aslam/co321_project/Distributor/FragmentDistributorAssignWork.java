@@ -289,7 +289,7 @@ public class FragmentDistributorAssignWork extends Fragment {
 
                 randomId = UUID.randomUUID().toString();
                 uploadDeliveryDetails = new UploadDeliveryDetails(distributorName, pharmacyName, driverName, cityName,
-                        distributorId, selectedPharmacyId, selectedDriverId, randomId, splittedBoxList);
+                        distributorId, selectedPharmacyId, selectedDriverId, randomId, splittedBoxList, false, false);
 
                 try {
                     setDriverTask();

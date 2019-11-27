@@ -29,6 +29,10 @@ public class BoxConditions extends AppCompatActivity {
     private GraphView graphTemperature;
     private GraphView graphHumidity;
     private GraphView graphPressure;
+    private int pressure = 0;
+    private int humidity = 0;
+    private int temp = 0;
+
     private String boxName = "";
     private String relayNode = "rn1001";
     private String [] readingTemperature = new String[5];
@@ -102,6 +106,7 @@ public class BoxConditions extends AppCompatActivity {
         graphPressure.setVisibility(View.GONE);
         graphHumidity.setVisibility(View.GONE);
 
+        temp=0;
         drawGraphTemperature();
 
         tvTemperature.setText("Temperature (C)");
@@ -121,6 +126,7 @@ public class BoxConditions extends AppCompatActivity {
         graphTemperature.setVisibility(View.GONE);
         graphHumidity.setVisibility(View.GONE);
 
+        pressure=0;
         drawGraphPressure();
 
         tvTemperature.setText("Temperature");
@@ -140,6 +146,7 @@ public class BoxConditions extends AppCompatActivity {
         graphPressure.setVisibility(View.GONE);
         graphTemperature.setVisibility(View.GONE);
 
+        humidity=0;
         drawGraphHumidity();
 
         tvTemperature.setText("Temperature");
@@ -235,8 +242,13 @@ public class BoxConditions extends AppCompatActivity {
         series.isDrawDataPoints();
         series.setDrawDataPoints(true);
         series.setThickness(3);
-        series.setAnimated(true);
+        if (temp==0) {
+            series.setAnimated(true);
+            temp++;
+        }else
+            series.setAnimated(false);
 
+        graphTemperature.removeAllSeries();
         graphTemperature.addSeries(series);
     }
 
@@ -257,8 +269,14 @@ public class BoxConditions extends AppCompatActivity {
         series.isDrawDataPoints();
         series.setDrawDataPoints(true);
         series.setThickness(3);
-        series.setAnimated(true);
 
+        if (humidity==0) {
+            series.setAnimated(true);
+            humidity++;
+        }else
+            series.setAnimated(false);
+
+        graphHumidity.removeAllSeries();
         graphHumidity.addSeries(series);
     }
 
@@ -279,8 +297,14 @@ public class BoxConditions extends AppCompatActivity {
         series.isDrawDataPoints();
         series.setDrawDataPoints(true);
         series.setThickness(3);
-        series.setAnimated(true);
 
+        if (pressure==0) {
+            series.setAnimated(true);
+            pressure++;
+        }else
+            series.setAnimated(false);
+
+        graphPressure.removeAllSeries();
         graphPressure.addSeries(series);
     }
 

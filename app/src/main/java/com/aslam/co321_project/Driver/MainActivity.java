@@ -135,6 +135,9 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_my_account_pharm_driv:
                     fragment = new FragmentDriverMyAccount();
                     break;
+                case R.id.navigation_noti_pharm_driver:
+                    fragment = new FragmentDriverNotification();
+                    break;
             }
             return loadFragment(fragment);
         }
@@ -153,6 +156,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_main);
+
+        startService(new Intent(getBaseContext(), NotificationService.class)); //notification service
 
         Toolbar toolbar = findViewById(R.id.driverToolbar);
         setSupportActionBar(toolbar);

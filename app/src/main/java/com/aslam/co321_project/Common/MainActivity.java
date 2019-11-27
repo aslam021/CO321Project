@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView logoImage;
     private Animation animBlink;
 
-
     @Override
     protected void onStart() {
         logoImage = findViewById(R.id.imageBlink);

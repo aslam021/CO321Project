@@ -122,7 +122,7 @@
         android:layout_height="wrap_content"
         android:text="time"
         android:layout_marginTop="-10dp"
-        android:gravity="right"
+        android:gravity="center"
         android:paddingRight="30dp"
         android:layout_marginBottom="5dp"
         android:paddingBottom="5dp"

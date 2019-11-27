@@ -12,6 +12,11 @@
         android:title="@string/past" />
 
     <item
+        android:id="@+id/navigation_noti_pharm_driver"
+        android:icon="@drawable/ic_notifications_black_24dp"
+        android:title="Notifications"/>
+
+    <item
         android:id="@+id/navigation_my_account_pharm_driv"
         android:icon="@drawable/ic_person_black_24dp"
         android:title="@string/my_profile" />

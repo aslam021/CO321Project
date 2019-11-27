@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -19,7 +20,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.ProfileTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Driver.ViewDistributionDriver"></activity>
+        <activity android:name=".Driver.BoxConditionForNoti"></activity>
+
+        <service android:name=".Driver.NotificationService" />
 
         <meta-data
             android:name="com.here.android.maps.appid"
@@ -41,7 +44,8 @@
             android:theme="@style/AppTheme.NoActionBar" /> <!-- Driver activities -->
         <activity
             android:name=".Driver.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" /> <!-- Common activities -->
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Driver.ViewDistributionDriver" /> <!-- Common activities -->
         <activity android:name=".Common.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
