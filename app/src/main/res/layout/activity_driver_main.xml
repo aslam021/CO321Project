@@ -14,7 +14,7 @@
         android:background="@color/colorActionBar"
         app:layout_constraintBottom_toTopOf="@id/driver_fragment_container"
         app:popupTheme="@style/PopupOverlay"
-        app:title="Surveil Pharma"
+        app:title="Vision Pod"
         app:titleTextColor="@color/white"
         app:titleMarginStart="20dp">
 
